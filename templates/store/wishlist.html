@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}My Wishlist - HamaroGhara{% endblock %}
+
+{% block content %}
+<h2 style="color: #ff6b35; margin-bottom: 30px; font-size: 28px;">❤️ My Wishlist</h2>
+
+{% if wishlist_items %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
+        {% for item in wishlist_items %}
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <a href="{% url 'store:product_detail' item.product.slug %}" style="text-decoration: none; color: inherit;">
+                    <div style="height: 200px; background: linear-gradient(45deg, #f5f5f5, #e0e0e0); display: flex; align-items: center; justify-content: center; font-size: 48px; color: #ff6b35;">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            🔧
+                        {% endif %}
+                    </div>
+                    <div style="padding: 20px;">
+                        <h3 style="color: #333; margin-bottom: 10px;">{{ item.product.name }}</h3>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">{{ item.product.description|truncatewords:12 }}</p>
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span style="font-size: 20px; font-weight: bold; color: #ff6b35;">${{ item.product.price }}</span>
+                            <span style="color: #4caf50; font-size: 14px;">{{ item.created_at|date:"M d" }}</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <div style="padding: 0 20px 20px; display: flex; gap: 10px;">
+                    {% if item.product.in_stock %}
+                        <form method="POST" action="{% url 'store:add_to_cart' item.product.id %}" style="flex: 1;">
+                            {% csrf_token %}
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="btn" style="width: 100%; padding: 8px;">Add to Cart</button>
+                        </form>
+                    {% endif %}
+                    <a href="{% url 'store:remove_from_wishlist' item.product.id %}" class="btn btn-secondary" style="padding: 8px 15px; text-decoration: none;">Remove</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 60px;">
+        <div style="font-size: 64px; margin-bottom: 20px;">❤️</div>
+        <h3 style="color: #666; margin-bottom: 15px;">Your wishlist is empty</h3>
+        <p style="color: #999; margin-bottom: 30px;">Save items you love for later!</p>
+        <a href="{% url 'store:home' %}" class="btn">Start Shopping</a>
+    </div>
+{% endif %}
+{% endblock %}

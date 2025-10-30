@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - HamaroGhara{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 50px auto; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; color: #ff6b35; margin-bottom: 30px; font-size: 28px;">Join HamaroGhara</h2>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">Create your account to start shopping</p>
+    
+    <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+        {% csrf_token %}
+        
+        <div>
+            <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Username:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div style="color: #f44336; font-size: 14px; margin-top: 5px;">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.password1.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Password:</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div style="color: #f44336; font-size: 14px; margin-top: 5px;">
+                    {% for error in form.password1.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.password2.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Confirm Password:</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div style="color: #f44336; font-size: 14px; margin-top: 5px;">
+                    {% for error in form.password2.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 20px;">
+            Create Account
+        </button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 30px; color: #666;">
+        Already have an account? 
+        <a href="{% url 'login' %}" style="color: #ff6b35; text-decoration: none; font-weight: 500;">Sign In</a>
+    </p>
+</div>
+
+<style>
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    
+    input[type="text"]:focus, input[type="password"]:focus {
+        outline: none;
+        border-color: #ff6b35;
+    }
+</style>
+{% endblock %}

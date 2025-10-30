@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment Successful - HamaroGhara{% endblock %}
+
+{% block content %}
+<div class="container" style="text-align: center; padding: 50px 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        <h2 style="color: #4caf50; font-size: 32px; margin-bottom: 20px;">✅ Payment Successful!</h2>
+        <p style="font-size: 18px; color: #555; margin-bottom: 30px;">Thank you for your order. Your order is being processed and will be shipped soon.</p>
+
+        <div style="text-align: left; border-top: 1px solid #eee; padding-top: 30px;">
+            <h3 style="color: #333; font-size: 22px; margin-bottom: 20px;">Order Summary</h3>
+            <p style="font-size: 16px; margin-bottom: 15px;"><strong>Order ID:</strong> {{ order.id }}</p>
+            <p style="font-size: 16px; margin-bottom: 15px;"><strong>Tracking Number:</strong> <span style="color: #ff6b35; font-weight: bold;">{{ order.tracking_number }}</span></p>
+            <p style="font-size: 16px; margin-bottom: 15px;"><strong>Total Amount:</strong> ${{ order.total_amount|floatformat:2 }}</p>
+            <p style_="font-size: 16px; margin-bottom: 30px;"><strong>Shipping Address:</strong><br>{{ order.shipping_address|linebreaksbr }}</p>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="{% url 'store:home' %}" class="btn" style="margin-right: 10px;">Continue Shopping</a>
+            <a href="{% url 'store:order_detail' order.id %}" class="btn-secondary">View Order Details</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

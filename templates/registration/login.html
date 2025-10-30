@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - HamaroGhara{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 50px auto; padding: 40px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+    <h2 style="text-align: center; color: #ff6b35; margin-bottom: 30px; font-size: 28px;">Welcome Back</h2>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">Sign in to your HamaroGhara account</p>
+    
+    <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+        {% csrf_token %}
+        
+        <div>
+            <label for="{{ form.username.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Username:</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div style="color: #f44336; font-size: 14px; margin-top: 5px;">
+                    {% for error in form.username.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="{{ form.password.id_for_label }}" style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Password:</label>
+            {{ form.password }}
+            {% if form.password.errors %}
+                <div style="color: #f44336; font-size: 14px; margin-top: 5px;">
+                    {% for error in form.password.errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if form.non_field_errors %}
+            <div style="color: #f44336; font-size: 14px; padding: 10px; background: #fff5f5; border-radius: 5px;">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 20px;">
+            Sign In
+        </button>
+    </form>
+    
+    <p style="text-align: center; margin-top: 30px; color: #666;">
+        Don't have an account? 
+        <a href="{% url 'store:register' %}" style="color: #ff6b35; text-decoration: none; font-weight: 500;">Register Now</a>
+    </p>
+</div>
+
+<style>
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+    }
+    
+    input[type="text"]:focus, input[type="password"]:focus {
+        outline: none;
+        border-color: #ff6b35;
+    }
+</style>
+{% endblock %}

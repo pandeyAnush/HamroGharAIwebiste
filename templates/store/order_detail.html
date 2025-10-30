@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.id }} - HamaroGhara{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div style="max-width: 800px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+            <h2 style="color: #ff6b35; font-size: 28px;">Order Details</h2>
+            <a href="{% url 'store:order_list' %}" class="btn-secondary">Back to My Orders</a>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <p><strong>Order ID:</strong> {{ order.id }}</p>
+            <p><strong>Date Placed:</strong> {{ order.created_at|date:"F d, Y" }}</p>
+            <p><strong>Tracking Number:</strong> {{ order.tracking_number }}</p>
+            <p><strong>Status:</strong> <span style="text-transform: capitalize; font-weight: bold; color: #007bff;">{{ order.status }}</span></p>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <h3 style="color: #333; margin-bottom: 20px;">Items Ordered</h3>
+            <div style="border: 1px solid #eee; border-radius: 8px;">
+                {% for item in order.items.all %}
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; {% if not forloop.last %}border-bottom: 1px solid #eee;{% endif %}">
+                    <div>
+                        <a href="{{ item.product.get_absolute_url }}" style="text-decoration: none; color: #333; font-weight: bold;">{{ item.product.name }}</a>
+                        <p style="color: #666; font-size: 14px; margin: 5px 0 0;">Quantity: {{ item.quantity }}</p>
+                    </div>
+                    <span style="font-weight: bold; color: #ff6b35;">${{ item.price|floatformat:2 }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1;">
+                <h3 style="color: #333; margin-bottom: 20px;">Shipping Address</h3>
+                <p style="line-height: 1.6;">{{ order.shipping_address|linebreaksbr }}</p>
+            </div>
+            <div style="flex: 1; text-align: right;">
+                <h3 style="color: #333; margin-bottom: 20px;">Order Total</h3>
+                <p style="font-size: 24px; font-weight: bold; color: #ff6b35;">${{ order.total_amount|floatformat:2 }}</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

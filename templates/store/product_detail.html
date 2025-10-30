@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - HamaroGhara{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 40px; margin-bottom: 60px;">
+        <!-- Product Image -->
+        <div style="flex: 1; min-width: 300px;">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            {% else %}
+                <img src="/static/images/placeholder.png" alt="No Image" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            {% endif %}
+        </div>
+
+        <!-- Product Details -->
+        <div style="flex: 2; min-width: 400px;">
+            <h1 style="font-size: 36px; color: #333; margin-bottom: 15px;">{{ product.name }}</h1>
+            <p style="font-size: 18px; color: #666; margin-bottom: 20px;">{{ product.category.name }}</p>
+
+            <div style="display: flex; align-items: center; margin-bottom: 25px;">
+                <span style="font-size: 32px; font-weight: bold; color: #ff6b35; margin-right: 15px;">${{ product.price|floatformat:2 }}</span>
+                {% if product.original_price and product.original_price > product.price %}
+                    <span style="text-decoration: line-through; color: #999; font-size: 22px; margin-right: 10px;">${{ product.original_price|floatformat:2 }}</span>
+                    <span style="background: #ff1744; color: white; padding: 5px 10px; border-radius: 5px; font-size: 16px; font-weight: bold;">-{{ product.get_discount_percentage }}%</span>
+                {% endif %}
+            </div>
+
+            <p style="font-size: 16px; color: #444; line-height: 1.6; margin-bottom: 30px;">{{ product.description }}</p>
+
+            <div style="margin-bottom: 30px;">
+                {% if product.in_stock %}
+                    <span style="color: #4caf50; font-size: 18px; font-weight: bold;">✓ In Stock</span>
+                {% else %}
+                    <span style="color: #f44336; font-size: 18px; font-weight: bold;">✗ Out of Stock</span>
+                {% endif %}
+            </div>
+
+            {% if user.is_authenticated and product.in_stock %}
+                <div style="display: flex; gap: 15px;">
+                    <form method="POST" action="{% url 'store:add_to_cart' product.id %}" style="flex: 1;">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 18px;">Add to Cart</button>
+                    </form>
+                    {% if in_wishlist %}
+                        <a href="{% url 'store:remove_from_wishlist' product.id %}" class="btn btn-secondary" style="padding: 15px 25px; font-size: 18px; text-decoration: none;">❤️ Added to Wishlist</a>
+                    {% else %}
+                        <a href="{% url 'store:add_to_wishlist' product.id %}" class="btn btn-secondary" style="padding: 15px 25px; font-size: 18px; text-decoration: none;">♡ Add to Wishlist</a>
+                    {% endif %}
+                </div>
+            {% elif not product.in_stock %}
+                <p style="color: #f44336; font-size: 18px; font-weight: bold;">This product is currently out of stock.</p>
+            {% else %}
+                <p style="font-size: 16px; color: #666;">Please <a href="{% url 'login' %}" style="color: #ff6b35;">log in</a> to add items to your cart or wishlist.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+        <h2 style="text-align: center; color: #ff6b35; font-size: 32px; margin-bottom: 30px;">You might also like</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
+            {% for related_product in related_products %}
+                <div class="card" style="padding: 0; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s;">
+                    <a href="{% url 'store:product_detail' related_product.slug %}" style="text-decoration: none; color: inherit;">
+                        <div style="height: 200px; background: linear-gradient(45deg, #f5f5f5, #e0e0e0); display: flex; align-items: center; justify-content: center; font-size: 48px; color: #ff6b35;">
+                            {% if related_product.image %}
+                                <img src="{{ related_product.image.url }}" alt="{{ related_product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                <img src="/static/images/placeholder.png" alt="No Image" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% endif %}
+                        </div>
+                        <div style="padding: 20px;">
+                            <h3 style="color: #333; margin-bottom: 10px; font-size: 18px;">{{ related_product.name }}</h3>
+                            <p style="color: #666; font-size: 14px; margin-bottom: 15px;">{{ related_product.description|truncatewords:12 }}</p>
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div>
+                                    <span style="font-size: 20px; font-weight: bold; color: #ff6b35;">${{ related_product.price }}</span>
+                                    {% if related_product.original_price and related_product.original_price > related_product.price %}
+                                        <span style="text-decoration: line-through; color: #999; margin-left: 10px;">${{ related_product.original_price }}</span>
+                                        <span style="background: #ff1744; color: white; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 10px;">-{{ related_product.get_discount_percentage }}%</span>
+                                    {% endif %}
+                                </div>
+                                {% if related_product.in_stock %}
+                                    <span style="color: #4caf50; font-size: 14px; font-weight: 500;">✓ In Stock</span>
+                                {% else %}
+                                    <span style="color: #f44336; font-size: 14px; font-weight: 500;">✗ Out of Stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    
+                    {% if user.is_authenticated and related_product.in_stock %}
+                        <div style="padding: 0 20px 20px; display: flex; gap: 10px;">
+                            <form method="POST" action="{% url 'store:add_to_cart' related_product.id %}" style="flex: 1;">
+                                {% csrf_token %}
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn" style="width: 100%; padding: 8px;">Add to Cart</button>
+                            </form>
+                            <a href="{% url 'store:add_to_wishlist' related_product.id %}" class="btn btn-secondary" style="padding: 8px 15px; text-decoration: none;">❤️</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

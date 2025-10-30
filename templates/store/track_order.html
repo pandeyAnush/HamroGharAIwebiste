@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Your Order - HamaroGhara{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h2 style="color: #ff6b35; margin-bottom: 30px; font-size: 28px; text-align: center;">📍 Track Your Order</h2>
+    
+    <div class="card" style="margin-bottom: 30px;">
+        <h3 style="color: #333; margin-bottom: 20px;">Enter Tracking Number</h3>
+        <form method="GET" style="display: flex; gap: 15px; align-items: end;">
+            <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 500; color: #333;">Tracking Number:</label>
+                <input type="text" name="tracking_number" value="{{ tracking_number }}" placeholder="Enter your tracking number (e.g., HG12345678)" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 16px;">
+            </div>
+            <button type="submit" class="btn" style="padding: 12px 20px;">Track Order</button>
+        </form>
+    </div>
+    
+    {% if order %}
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #eee;">
+                <div>
+                    <h3 style="color: #333; margin-bottom: 5px;">Order #{{ order.id }}</h3>
+                    <p style="color: #666; margin: 0;">Tracking: {{ order.tracking_number }}</p>
+                </div>
+                <div style="text-align: right;">
+                    <span style="background: 
+                        {% if order.status == 'pending' %}#ffc107
+                        {% elif order.status == 'processing' %}#17a2b8
+                        {% elif order.status == 'shipped' %}#ff6b35
+                        {% elif order.status == 'delivered' %}#28a745
+                        {% else %}#dc3545{% endif %}; 
+                        color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; text-transform: uppercase;">
+                        {{ order.get_status_display }}
+                    </span>
+                </div>
+            </div>
+            
+            <!-- Order Timeline -->
+            <div style="margin-bottom: 30px;">
+                <h4 style="color: #333; margin-bottom: 20px;">Order Progress</h4>
+                <div style="position: relative;">
+                    <div style="position: absolute; left: 15px; top: 40px; bottom: 0; width: 2px; background: #e0e0e0; z-index: 1;"></div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 2;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #28a745; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">✓</div>
+                            <div>
+                                <h5 style="color: #333; margin-bottom: 3px;">Order Placed</h5>
+                                <p style="color: #666; font-size: 14px; margin: 0;">{{ order.created_at|date:"M d, Y - g:i A" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}#28a745{% else %}#e0e0e0{% endif %}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                {% if order.status == 'processing' or order.status == 'shipped' or order.status == 'delivered' %}✓{% else %}2{% endif %}
+                            </div>
+                            <div>
+                                <h5 style="color: #333; margin-bottom: 3px;">Processing</h5>
+                                <p style="color: #666; font-size: 14px; margin: 0;">Your order is being prepared</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: {% if order.status == 'shipped' or order.status == 'delivered' %}#28a745{% else %}#e0e0e0{% endif %}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                {% if order.status == 'shipped' or order.status == 'delivered' %}✓{% else %}3{% endif %}
+                            </div>
+                            <div>
+                                <h5 style="color: #333; margin-bottom: 3px;">Shipped</h5>
+                                <p style="color: #666; font-size: 14px; margin: 0;">Your order is on the way</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: {% if order.status == 'delivered' %}#28a745{% else %}#e0e0e0{% endif %}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                {% if order.status == 'delivered' %}✓{% else %}4{% endif %}
+                            </div>
+                            <div>
+                                <h5 style="color: #333; margin-bottom: 3px;">Delivered</h5>
+                                <p style="color: #666; font-size: 14px; margin: 0;">Order has been delivered</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Details -->
+            <div style="border-top: 1px solid #eee; padding-top: 25px;">
+                <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 300px;">
+                        <h4 style="color: #333; margin-bottom: 15px;">Order Items</h4>
+                        {% for item in order.items.all %}
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; {% if not forloop.last %}border-bottom: 1px solid #f0f0f0;{% endif %}">
+                                <div>
+                                    <strong>{{ item.product.name }}</strong>
+                                    <span style="color: #666; margin-left: 10px;">x{{ item.quantity }}</span>
+                                </div>
+                                <span style="font-weight: bold; color: #ff6b35;">${{ item.get_total_price }}</span>
+                            </div>
+                        {% endfor %}
+                        <div style="border-top: 2px solid #eee; padding-top: 10px; margin-top: 10px; text-align: right;">
+                            <strong style="color: #ff6b35; font-size: 18px;">Total: ${{ order.total_amount }}</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="flex: 1; min-width: 300px;">
+                        <h4 style="color: #333; margin-bottom: 15px;">Shipping Address</h4>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <p style="color: #333; margin: 0; white-space: pre-line;">{{ order.shipping_address }}</p>
+                        </div>
+                        
+                        {% if order.status == 'shipped' or order.status == 'delivered' %}
+                        <div style="margin-top: 20px;">
+                            <h4 style="color: #333; margin-bottom: 10px;">Estimated Delivery</h4>
+                            <p style="color: #666; margin: 0;">
+                                {% if order.status == 'delivered' %}
+                                    Delivered
+                                {% else %}
+                                    2-3 business days
+                                {% endif %}
+                            </p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif tracking_number %}
+        <div class="card" style="text-align: center; padding: 40px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+            <h3 style="color: #f44336; margin-bottom: 15px;">Order Not Found</h3>
+            <p style="color: #666; margin-bottom: 20px;">No order found with tracking number: <strong>{{ tracking_number }}</strong></p>
+            <p style="color: #999; font-size: 14px;">Please check your tracking number and try again.</p>
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 40px;">
+            <div style="font-size: 64px; margin-bottom: 20px;">📍</div>
+            <h3 style="color: #666; margin-bottom: 15px;">Track Your Order</h3>
+            <p style="color: #999;">Enter your tracking number above to get real-time updates on your order status.</p>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #ff6b35;
+    }
+    
+    @media (max-width: 768px) {
+        .order-details {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

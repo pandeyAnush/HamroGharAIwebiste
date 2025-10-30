@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - HamaroGhara{% endblock %}
+
+{% block content %}
+<h2 style="color: #ff6b35; margin-bottom: 30px; font-size: 28px;">📦 My Orders</h2>
+
+{% if orders %}
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        {% for order in orders %}
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee;">
+                    <div>
+                        <h3 style="color: #333; margin-bottom: 5px;">Order #{{ order.id }}</h3>
+                        <p style="color: #666; margin: 0;">{{ order.created_at|date:"M d, Y" }} • {{ order.items.count }} item{{ order.items.count|pluralize }}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="background: 
+                            {% if order.status == 'pending' %}#ffc107
+                            {% elif order.status == 'processing' %}#17a2b8
+                            {% elif order.status == 'shipped' %}#ff6b35
+                            {% elif order.status == 'delivered' %}#28a745
+                            {% else %}#dc3545{% endif %}; 
+                            color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+                            {{ order.get_status_display }}
+                        </span>
+                        <div style="font-size: 18px; font-weight: bold; color: #ff6b35; margin-top: 5px;">${{ order.total_amount }}</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <p style="color: #666; margin-bottom: 10px;"><strong>Tracking:</strong> {{ order.tracking_number }}</p>
+                        {% for item in order.items.all|slice:":3" %}
+                            <span style="color: #333; margin-right: 15px;">{{ item.product.name }} ({{ item.quantity }})</span>
+                        {% endfor %}
+                        {% if order.items.count > 3 %}
+                            <span style="color: #999;">and {{ order.items.count|add:"-3" }} more...</span>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="{% url 'store:order_detail' order.id %}" class="btn btn-secondary" style="padding: 8px 15px; text-decoration: none;">View Details</a>
+                        {% if order.status == 'shipped' or order.status == 'delivered' %}
+                            <a href="{% url 'store:track_order' %}?tracking_number={{ order.tracking_number }}" class="btn" style="padding: 8px 15px; text-decoration: none;">Track</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card" style="text-align: center; padding: 60px;">
+        <div style="font-size: 64px; margin-bottom: 20px;">📦</div>
+        <h3 style="color: #666; margin-bottom: 15px;">No orders yet</h3>
+        <p style="color: #999; margin-bottom: 30px;">Start shopping to see your orders here!</p>
+        <a href="{% url 'store:home' %}" class="btn">Start Shopping</a>
+    </div>
+{% endif %}
+{% endblock %}

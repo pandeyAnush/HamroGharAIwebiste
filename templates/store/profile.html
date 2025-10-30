@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - HamaroGhara{% endblock %}
+
+{% block content %}
+<style>
+    .profile-container {
+        max-width: 960px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #f9f9f9;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 40px;
+    }
+    .profile-sidebar {
+        text-align: center;
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .profile-picture-container {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 0 auto 20px auto;
+        border: 5px solid #ff6b35;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background-color: #f0f0f0;
+    }
+    .profile-picture {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .profile-initial {
+        font-size: 72px;
+        color: #ff6b35;
+        font-weight: bold;
+    }
+    .profile-sidebar h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 5px;
+    }
+    .profile-sidebar p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 20px;
+    }
+    .profile-main {
+        padding: 20px;
+    }
+    .profile-main h3 {
+        font-size: 22px;
+        color: #ff6b35;
+        margin-bottom: 25px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #555;
+    }
+    .form-control,
+    .form-control-file {
+        display: block;
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+    .form-control-file {
+        padding: 5px;
+    }
+    .btn-update {
+        background-color: #ff6b35;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .btn-update:hover {
+        background-color: #e05a2d;
+    }
+    #password-form-container {
+        display: none;
+    }
+</style>
+
+<div class="profile-container">
+    <div class="profile-sidebar">
+        <div class="profile-picture-container">
+            {% if user.profile.profile_picture and user.profile.profile_picture.url != '/media/profile_pics/default.jpg' %}
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="profile-picture">
+            {% else %}
+                <div class="profile-initial">{{ user.username.0|upper }}</div>
+            {% endif %}
+        </div>
+        <h2>{{ user.first_name }} {{ user.last_name }}</h2>
+        <p>@{{ user.username }}</p>
+        <a href="{% url 'logout' %}" style="color: #ff6b35; text-decoration: none; font-weight: bold;">Log Out</a>
+    </div>
+    <div class="profile-main">
+        <h3>Edit Your Profile</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_first_name">First Name</label>
+                {{ u_form.first_name }}
+            </div>
+            <div class="form-group">
+                <label for="id_last_name">Last Name</label>
+                {{ u_form.last_name }}
+            </div>
+            <div class="form-group">
+                <label for="id_email">Email</label>
+                {{ u_form.email }}
+            </div>
+            <div class="form-group">
+                <label for="id_profile_picture">Profile Picture</label>
+                <input type="file" name="{{ p_form.profile_picture.name }}" id="{{ p_form.profile_picture.id_for_label }}" class="form-control-file">
+            </div>
+            <div class="form-group">
+                <button class="btn-update" type="submit" name="update_profile">Update Profile</button>
+            </div>
+        </form>
+
+        <h3 style="margin-top: 40px;">Security</h3>
+        <button class="btn-update" id="change-password-btn">Change Password</button>
+        <div id="password-form-container" style="margin-top: 20px;">
+            <form method="POST">
+                {% csrf_token %}
+                {{ password_form.as_p }}
+                <div class="form-group">
+                    <button class="btn-update" type="submit" name="change_password">Save New Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('change-password-btn').addEventListener('click', function() {
+        var formContainer = document.getElementById('password-form-container');
+        if (formContainer.style.display === 'none') {
+            formContainer.style.display = 'block';
+            this.textContent = 'Cancel';
+        } else {
+            formContainer.style.display = 'none';
+            this.textContent = 'Change Password';
+        }
+    });
+</script>
+{% endblock %}

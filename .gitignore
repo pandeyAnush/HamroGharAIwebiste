@@ -1,6 +1,23 @@
-node_modules
-dist
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+
+# Virtual environment
+venv/
+env/
+
+# Django stuff
+*.pot
+*.pyc
+db.sqlite3
+/staticfiles/
+media/
+
+# VS Code and Mac system files
+.vscode/
 .DS_Store
-server/public
-vite.config.ts.*
-*.tar.gz
+
+# Environment variables
+*.env

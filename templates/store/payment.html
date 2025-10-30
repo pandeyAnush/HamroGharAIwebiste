@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - HamaroGhara{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <h2 style="color: #ff6b35; margin-bottom: 30px; font-size: 28px; text-align: center;">💳 Payment</h2>
+    
+    <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+        <!-- Payment Methods -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card">
+                <h3 style="color: #333; margin-bottom: 25px;">Choose Payment Method</h3>
+                
+                <form method="POST">
+                    {% csrf_token %}
+                    
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; margin-bottom: 15px; transition: border-color 0.3s;">
+                            <input type="radio" name="payment_method" value="card" required style="margin-right: 15px; transform: scale(1.2);">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <span style="font-size: 24px; margin-right: 10px;">💳</span>
+                                    <strong>Credit/Debit Card</strong>
+                                </div>
+                                <p style="color: #666; font-size: 14px; margin: 0;">Visa, MasterCard, American Express</p>
+                            </div>
+                        </label>
+                        
+                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; margin-bottom: 15px; transition: border-color 0.3s;">
+                            <input type="radio" name="payment_method" value="paypal" style="margin-right: 15px; transform: scale(1.2);">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <span style="font-size: 24px; margin-right: 10px;">🅿️</span>
+                                    <strong>PayPal</strong>
+                                </div>
+                                <p style="color: #666; font-size: 14px; margin: 0;">Pay with your PayPal account</p>
+                            </div>
+                        </label>
+                        
+                        <label style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; margin-bottom: 15px; transition: border-color 0.3s;">
+                            <input type="radio" name="payment_method" value="cod" style="margin-right: 15px; transform: scale(1.2);">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                    <span style="font-size: 24px; margin-right: 10px;">💵</span>
+                                    <strong>Cash on Delivery</strong>
+                                </div>
+                                <p style="color: #666; font-size: 14px; margin: 0;">Pay when your order arrives</p>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div style="background: #fff3e0; padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+                        <h4 style="color: #f57c00; margin-bottom: 10px;">🛡️ Secure Payment</h4>
+                        <p style="color: #666; font-size: 14px; margin: 0;">
+                            This is a demo payment system. No real charges will be made. 
+                            Your order will be processed as if payment was successful.
+                        </p>
+                    </div>
+                    
+                    <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 18px;">
+                        Complete Payment
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div style="flex: 1; min-width: 300px;">
+            <div class="card" style="position: sticky; top: 20px;">
+                <h3 style="color: #ff6b35; margin-bottom: 20px;">Order #{{ order.id }}</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: #333; margin-bottom: 10px;">Items:</h4>
+                    {% for item in order.items.all %}
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; {% if not forloop.last %}border-bottom: 1px solid #eee;{% endif %}">
+                            <span>{{ item.product.name }} x{{ item.quantity }}</span>
+                            <span>${{ item.get_total_price }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div style="border-top: 2px solid #eee; padding-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Subtotal:</span>
+                        <span>${{ order.total_amount }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>Shipping:</span>
+                        <span style="color: #4caf50;">FREE</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; color: #ff6b35;">
+                        <span>Total:</span>
+                        <span>${{ order.total_amount }}</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <h4 style="color: #333; margin-bottom: 10px; font-size: 16px;">📍 Shipping To:</h4>
+                    <p style="color: #666; font-size: 14px; margin: 0; white-space: pre-line;">{{ order.shipping_address }}</p>
+                </div>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f0f8ff; border-radius: 8px; text-align: center;">
+                    <h4 style="color: #333; margin-bottom: 10px; font-size: 16px;">📦 Tracking Number</h4>
+                    <p style="color: #ff6b35; font-weight: bold; font-size: 16px; margin: 0;">{{ order.tracking_number }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="radio"]:checked + div {
+        color: #ff6b35;
+    }
+    
+    label:has(input[type="radio"]:checked) {
+        border-color: #ff6b35 !important;
+        background-color: #fff8f0;
+    }
+    
+    @media (max-width: 768px) {
+        .payment-container {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load cart_extras %}
+
+{% block title %}Checkout - HamaroGhara{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 30px; flex-wrap: wrap;">
+    <!-- Checkout Form -->
+    <div style="flex: 2; min-width: 300px;">
+        <h2 style="color: #ff6b35; margin-bottom: 30px; font-size: 28px;">📦 Checkout</h2>
+        
+        <form method="POST" style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;">🏠 Shipping Address</h3>
+                <textarea name="shipping_address" required placeholder="Enter your complete shipping address..." style="width: 100%; height: 120px; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; resize: vertical; font-family: inherit;"></textarea>
+                <p style="font-size: 12px; color: #666; margin-top: 5px;">Please include your full name, street address, city, state, and postal code.</p>
+            </div>
+            
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #333; margin-bottom: 20px; font-size: 20px;">📋 Order Review</h3>
+                <div style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                    {% for item in cart_items %}
+                        <div style="padding: 15px; {% if not forloop.last %}border-bottom: 1px solid #e0e0e0;{% endif %} display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>{{ item.product.name }}</strong>
+                                <span style="color: #666; margin-left: 10px;">x{{ item.quantity }}</span>
+                            </div>
+                            <span style="font-weight: bold; color: #ff6b35;">${{ item.get_total_price }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%; padding: 15px; font-size: 18px;">
+                Place Order
+            </button>
+        </form>
+    </div>
+    
+    <!-- Order Summary -->
+    <div style="flex: 1; min-width: 300px;">
+        <div class="card" style="position: sticky; top: 20px;">
+            <h3 style="color: #ff6b35; margin-bottom: 20px;">Order Summary</h3>
+            
+            <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Subtotal:</span>
+                    <span>${{ total }}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Shipping:</span>
+                    <span style="color: #4caf50;">
+                        {% if total >= 50 %}
+                            FREE
+                        {% else %}
+                            $9.99
+                        {% endif %}
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Tax:</span>
+                    <span>${{ total|floatformat:2|mul:0.08|floatformat:2 }}</span>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px;">
+                <span>Total:</span>
+                <span style="color: #ff6b35;">
+                    {% with total_with_tax=total|mul:1.08 %}
+                    ${% if total >= 50 %}{{ total_with_tax|floatformat:2 }}{% else %}{{ total_with_tax|add:9.99|floatformat:2 }}{% endif %}
+                    {% endwith %}
+                </span>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <h4 style="color: #333; margin-bottom: 10px; font-size: 16px;">🚚 Estimated Delivery</h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 5px;">Standard: 5-7 business days</p>
+                <p style="color: #666; font-size: 14px;">Express: 2-3 business days (+$15)</p>
+            </div>
+            
+            <div style="text-align: center; padding: 15px; background: #fff5f5; border-radius: 8px; border: 1px solid #ffe0e0;">
+                <div style="font-size: 24px; margin-bottom: 10px;">🔒</div>
+                <p style="font-size: 12px; color: #666;">Your payment is secured with 256-bit SSL encryption</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    textarea:focus {
+        outline: none;
+        border-color: #ff6b35;
+    }
+    
+    @media (max-width: 768px) {
+        .container > div {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
